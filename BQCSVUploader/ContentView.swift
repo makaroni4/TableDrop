@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var isUploading = false
     @State private var statusMessage = ""
     @State private var statusIsError = false
+    @State private var uploadResult: BQUploadService.UploadResult?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -51,8 +52,10 @@ struct ContentView: View {
                         .font(.system(size: 28))
                         .foregroundStyle(.secondary)
                 }
-                Text(isUploading ? "Uploading…" : "Drop CSV here")
-                    .font(.headline)
+                if !isUploading {
+                    Text("Drop CSV here")
+                        .font(.headline)
+                }
                 if let selectedFileURL, isUploading {
                     Text(selectedFileURL.lastPathComponent)
                         .font(.caption)
@@ -76,15 +79,32 @@ struct ContentView: View {
     }
 
     private var statusView: some View {
-        Group {
-            if !statusMessage.isEmpty {
+        VStack(alignment: .leading, spacing: 8) {
+            if let uploadResult {
+                if uploadResult.succeeded {
+                    Text("🟢 Table was uploaded successfully.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("🔴 There was an error during the upload")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                    if let log = uploadResult.log {
+                        Text(log)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                }
+            } else if !statusMessage.isEmpty {
                 Text(statusMessage)
                     .font(.caption)
                     .foregroundStyle(statusIsError ? .red : .secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func openFilePicker() {
@@ -141,12 +161,14 @@ struct ContentView: View {
         guard !isUploading else { return }
 
         guard url.pathExtension.lowercased() == "csv" else {
+            uploadResult = nil
             statusMessage = "Please choose a .csv file."
             statusIsError = true
             return
         }
 
         guard !tableReference.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            uploadResult = nil
             statusMessage = "Enter a table reference before uploading."
             statusIsError = true
             return
@@ -162,6 +184,7 @@ struct ContentView: View {
         isUploading = true
         statusMessage = ""
         statusIsError = false
+        uploadResult = nil
 
         Task {
             do {
@@ -170,13 +193,14 @@ struct ContentView: View {
                     tableReference: tableReference
                 )
                 await MainActor.run {
-                    statusMessage = result
-                    statusIsError = false
+                    uploadResult = result
+                    statusMessage = ""
                     isUploading = false
                     selectedFileURL = nil
                 }
             } catch {
                 await MainActor.run {
+                    uploadResult = nil
                     statusMessage = error.localizedDescription
                     statusIsError = true
                     isUploading = false

@@ -25,6 +25,11 @@ enum BQUploadError: LocalizedError {
 }
 
 struct BQUploadService {
+    struct UploadResult {
+        let succeeded: Bool
+        let log: String?
+    }
+
     private struct UploadCommand {
         let executable: String
         let prefixArguments: [String]
@@ -228,7 +233,23 @@ struct BQUploadService {
         return result.status == 0
     }
 
-    static func upload(csvURL: URL, tableReference: String) async throws -> String {
+    private static func parseUploadResponse(_ output: String) -> UploadResult? {
+        let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let data = trimmed.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let status = json["status"] as? String
+        else {
+            return nil
+        }
+
+        let log = (json["log"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return UploadResult(
+            succeeded: status == "success",
+            log: log?.isEmpty == false ? log : nil
+        )
+    }
+
+    static func upload(csvURL: URL, tableReference: String) async throws -> UploadResult {
         let bqPath = findBQExecutable()
         guard let bqPath else { throw BQUploadError.bqNotFound }
 
@@ -237,7 +258,6 @@ struct BQUploadService {
         guard let uploadCommand = resolveUploadCommand(environment: &environment) else {
             throw BQUploadError.uploadCLINotFound
         }
-        var log: [String] = []
 
         if !bqObjectExists(executable: bqPath, reference: components.datasetReference, environment: environment) {
             let result = try runCommand(
@@ -252,7 +272,6 @@ struct BQUploadService {
                         : result.output
                 )
             }
-            log.append("Created dataset \(components.dataset).")
         }
 
         let tableExists = bqObjectExists(
@@ -266,12 +285,10 @@ struct BQUploadService {
             "--project", components.project,
             "--dataset", components.dataset,
             "--table", components.table,
+            "--output", "json",
         ]
         if tableExists {
             uploadArguments.append("--replace")
-            log.append("Replacing existing table \(components.table).")
-        } else {
-            log.append("Table \(components.table) not found — creating with autodetected schema.")
         }
 
         let uploadResult = try runCommand(
@@ -280,6 +297,10 @@ struct BQUploadService {
             environment: environment
         )
 
+        if let parsed = parseUploadResponse(uploadResult.output) {
+            return parsed
+        }
+
         guard uploadResult.status == 0 else {
             let message = uploadResult.output.isEmpty
                 ? "upload-bq-dataset failed with exit code \(uploadResult.status)"
@@ -287,13 +308,6 @@ struct BQUploadService {
             throw BQUploadError.uploadFailed(message)
         }
 
-        if !uploadResult.output.isEmpty {
-            log.append(uploadResult.output)
-        }
-        if log.isEmpty {
-            log.append("Upload complete.")
-        }
-
-        return log.joined(separator: "\n")
+        return UploadResult(succeeded: true, log: nil)
     }
 }
