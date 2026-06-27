@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -93,7 +94,7 @@ struct ContentView: View {
         .frame(maxWidth: .infinity)
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .onTapGesture { openFilePicker() }
-        .onDrop(of: [.fileURL, .commaSeparatedText], isTargeted: $isTargeted) { providers in
+        .onDrop(of: [.fileURL, .url], isTargeted: $isTargeted) { providers in
             handleDrop(providers: providers)
         }
     }
@@ -131,17 +132,37 @@ struct ContentView: View {
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first else { return false }
 
-        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
-                guard let data = item as? Data,
-                      let url = URL(dataRepresentation: data, relativeTo: nil)
-                else { return }
+        if provider.canLoadObject(ofClass: URL.self) {
+            provider.loadObject(ofClass: URL.self) { item, _ in
+                guard let url = item as? URL else { return }
                 DispatchQueue.main.async { selectFile(url) }
             }
             return true
         }
 
-        return false
+        let typeIdentifiers = [UTType.fileURL.identifier, UTType.url.identifier]
+        guard let typeId = typeIdentifiers.first(where: { provider.hasItemConformingToTypeIdentifier($0) }) else {
+            return false
+        }
+
+        provider.loadItem(forTypeIdentifier: typeId, options: nil) { item, _ in
+            guard let url = urlFromDropItem(item) else { return }
+            DispatchQueue.main.async { selectFile(url) }
+        }
+        return true
+    }
+
+    private func urlFromDropItem(_ item: NSSecureCoding?) -> URL? {
+        if let url = item as? URL { return url }
+        if let nsurl = item as? NSURL { return nsurl as URL }
+        if let data = item as? Data { return URL(dataRepresentation: data, relativeTo: nil) }
+        if let string = item as? String {
+            if string.hasPrefix("file://") {
+                return URL(string: string)
+            }
+            return URL(fileURLWithPath: string)
+        }
+        return nil
     }
 
     private func selectFile(_ url: URL) {
