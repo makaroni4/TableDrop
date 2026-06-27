@@ -4,5 +4,6 @@ Development.xcconfig
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 build/
+dist/
 DerivedData/
 .DS_Store

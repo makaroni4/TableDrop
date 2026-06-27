@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+VERSION="$(
+  sed -n 's/.*MARKETING_VERSION = \(.*\);/\1/p' TableDrop.xcodeproj/project.pbxproj | head -1 | tr -d ' '
+)"
+TAG="v${VERSION}"
+ZIP="$ROOT/dist/TableDrop-${VERSION}.zip"
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "error: gh CLI is required (https://cli.github.com/)" >&2
+  exit 1
+fi
+
+if gh release view "$TAG" >/dev/null 2>&1; then
+  echo "error: GitHub release already exists for tag ${TAG}" >&2
+  gh release view "$TAG" --json url -q .url >&2
+  exit 1
+fi
+
+"$ROOT/bin/build"
+
+echo "Creating GitHub release ${TAG}..."
+gh release create "$TAG" "$ZIP" \
+  --title "Table Drop ${VERSION}" \
+  --generate-notes
+
+echo "Published $(gh release view "$TAG" --json url -q .url)"

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+DERIVED_DATA="$ROOT/build"
+APP="$DERIVED_DATA/Build/Products/Release/TableDrop.app"
+DIST="$ROOT/dist"
+VERSION="$(
+  sed -n 's/.*MARKETING_VERSION = \(.*\);/\1/p' TableDrop.xcodeproj/project.pbxproj | head -1 | tr -d ' '
+)"
+ZIP="$DIST/TableDrop-${VERSION}.zip"
+
+mkdir -p "$DIST"
+
+echo "Building Table Drop ${VERSION}..."
+xcodebuild \
+  -project TableDrop.xcodeproj \
+  -scheme TableDrop \
+  -configuration Release \
+  -derivedDataPath "$DERIVED_DATA" \
+  build
+
+rm -f "$ZIP"
+COPYFILE_DISABLE=1 ditto -c -k --keepParent "$APP" "$ZIP"
+
+echo "Wrote $ZIP"

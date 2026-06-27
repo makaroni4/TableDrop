@@ -35,14 +35,14 @@ struct BQUploadService {
         let prefixArguments: [String]
     }
 
-    private static let devUploadModule = "bqcsv.cli"
+    private static let devUploadModule = "src.cli"
 
     #if DEBUG
     private static func resolveDevUploadRepoPath() -> String? {
         guard let path = ProcessInfo.processInfo.environment["BQCSV_DEV_REPO"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !path.isEmpty,
-              FileManager.default.isReadableFile(atPath: "\(path)/bqcsv/cli.py")
+              FileManager.default.isReadableFile(atPath: "\(path)/src/cli.py")
         else {
             return nil
         }
