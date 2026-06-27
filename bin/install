@@ -116,9 +116,9 @@ print_completion_message() {
 main() {
   require_macos
   info "CSV Drop setup"
-  check_gcloud
-  install_bqcsv
   install_csvdrop
+  install_bqcsv
+  check_gcloud
   print_completion_message
 }
 
