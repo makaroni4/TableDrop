@@ -7,18 +7,11 @@ struct ContentView: View {
     @State private var selectedFileURL: URL?
     @State private var isTargeted = false
     @State private var isUploading = false
-    @State private var statusMessage = "Drop a CSV file or click to browse."
+    @State private var statusMessage = ""
     @State private var statusIsError = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("BigQuery CSV Uploader")
-                .font(.title2.weight(.semibold))
-
-            Text("Uses upload-bq-dataset with your gcloud / bq credentials.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
             VStack(alignment: .leading, spacing: 6) {
                 Text("Table reference")
                     .font(.headline)
@@ -29,42 +22,12 @@ struct ContentView: View {
 
             dropZone
 
-            if let selectedFileURL {
-                HStack {
-                    Image(systemName: "doc.text")
-                        .foregroundStyle(.secondary)
-                    Text(selectedFileURL.lastPathComponent)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                    Spacer()
-                    Button("Clear") {
-                        self.selectedFileURL = nil
-                        resetStatus()
-                    }
-                    .disabled(isUploading)
-                }
-                .font(.callout)
-            }
-
-            Button(action: startUpload) {
-                HStack {
-                    if isUploading {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
-                    Text(isUploading ? "Uploading…" : "Upload to BigQuery")
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!canUpload)
-
             statusView
 
             Spacer(minLength: 0)
         }
         .padding(20)
-        .frame(minWidth: 440, minHeight: 380)
+        .frame(minWidth: 440, minHeight: 300)
     }
 
     private var dropZone: some View {
@@ -80,40 +43,48 @@ struct ContentView: View {
                 )
 
             VStack(spacing: 8) {
-                Image(systemName: "arrow.down.doc")
-                    .font(.system(size: 28))
-                    .foregroundStyle(.secondary)
-                Text("Drop CSV here")
+                if isUploading {
+                    ProgressView()
+                        .controlSize(.regular)
+                } else {
+                    Image(systemName: "arrow.down.doc")
+                        .font(.system(size: 28))
+                        .foregroundStyle(.secondary)
+                }
+                Text(isUploading ? "Uploading…" : "Drop CSV here")
                     .font(.headline)
-                Text("or click to choose a file")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let selectedFileURL, isUploading {
+                    Text(selectedFileURL.lastPathComponent)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                } else {
+                    Text("or click to choose a file")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.vertical, 28)
         }
         .frame(maxWidth: .infinity)
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .onTapGesture { openFilePicker() }
+        .onTapGesture { if !isUploading { openFilePicker() } }
         .onDrop(of: [.fileURL, .url], isTargeted: $isTargeted) { providers in
             handleDrop(providers: providers)
         }
     }
 
     private var statusView: some View {
-        Text(statusMessage)
-            .font(.caption)
-            .foregroundStyle(statusIsError ? .red : .secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .textSelection(.enabled)
-    }
-
-    private var canUpload: Bool {
-        !isUploading && selectedFileURL != nil && !tableReference.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private func resetStatus() {
-        statusMessage = "Drop a CSV file or click to browse."
-        statusIsError = false
+        Group {
+            if !statusMessage.isEmpty {
+                Text(statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(statusIsError ? .red : .secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+        }
     }
 
     private func openFilePicker() {
@@ -130,6 +101,7 @@ struct ContentView: View {
     }
 
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        guard !isUploading else { return false }
         guard let provider = providers.first else { return false }
 
         if provider.canLoadObject(ofClass: URL.self) {
@@ -166,39 +138,49 @@ struct ContentView: View {
     }
 
     private func selectFile(_ url: URL) {
+        guard !isUploading else { return }
+
         guard url.pathExtension.lowercased() == "csv" else {
             statusMessage = "Please choose a .csv file."
             statusIsError = true
             return
         }
+
+        guard !tableReference.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            statusMessage = "Enter a table reference before uploading."
+            statusIsError = true
+            return
+        }
+
         selectedFileURL = url
-        statusMessage = "Ready to upload."
-        statusIsError = false
+        startUpload()
     }
 
     private func startUpload() {
-        guard let selectedFileURL else { return }
+        guard let fileURL = selectedFileURL else { return }
 
         isUploading = true
-        statusMessage = "Running upload…"
+        statusMessage = ""
         statusIsError = false
 
         Task {
             do {
                 let result = try await BQUploadService.upload(
-                    csvURL: selectedFileURL,
+                    csvURL: fileURL,
                     tableReference: tableReference
                 )
                 await MainActor.run {
                     statusMessage = result
                     statusIsError = false
                     isUploading = false
+                    selectedFileURL = nil
                 }
             } catch {
                 await MainActor.run {
                     statusMessage = error.localizedDescription
                     statusIsError = true
                     isUploading = false
+                    selectedFileURL = nil
                 }
             }
         }
