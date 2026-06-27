@@ -1,4 +1,5 @@
 TableDrop/
+Development.xcconfig
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/

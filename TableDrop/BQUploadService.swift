@@ -12,7 +12,7 @@ enum BQUploadError: LocalizedError {
             return "Invalid table reference '\(ref)'. Use project_id.dataset_id.table_id"
         case .uploadCLINotFound:
             #if DEBUG
-            return "Local bqcsv module not found. Check /Users/makaroni4/Startups/bqcsv and ensure python3 is on your PATH."
+            return "bqcsv not found. Set BQCSV_DEV_REPO to your local bqcsv repo, install bqcsv (pip install bqcsv), or set BQCSV_PATH."
             #else
             return "bqcsv CLI not found. Install it and ensure it is on your PATH."
             #endif
@@ -35,9 +35,19 @@ struct BQUploadService {
         let prefixArguments: [String]
     }
 
-    #if DEBUG
-    private static let devUploadRepoPath = "/Users/makaroni4/Startups/bqcsv"
     private static let devUploadModule = "bqcsv.cli"
+
+    #if DEBUG
+    private static func resolveDevUploadRepoPath() -> String? {
+        guard let path = ProcessInfo.processInfo.environment["BQCSV_DEV_REPO"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+              !path.isEmpty,
+              FileManager.default.isReadableFile(atPath: "\(path)/bqcsv/cli.py")
+        else {
+            return nil
+        }
+        return path
+    }
     #endif
 
     struct TableComponents {
@@ -110,26 +120,22 @@ struct BQUploadService {
 
     private static func resolveUploadCommand(environment: inout [String: String]) -> UploadCommand? {
         #if DEBUG
-        let cliPath = "\(devUploadRepoPath)/bqcsv/cli.py"
-        guard FileManager.default.isReadableFile(atPath: cliPath),
-              let pythonPath = findPythonExecutable()
-        else {
-            return nil
+        if let devUploadRepoPath = resolveDevUploadRepoPath(),
+           let pythonPath = findPythonExecutable() {
+            let existingPythonPath = environment["PYTHONPATH"] ?? ""
+            environment["PYTHONPATH"] = existingPythonPath.isEmpty
+                ? devUploadRepoPath
+                : "\(devUploadRepoPath):\(existingPythonPath)"
+
+            return UploadCommand(
+                executable: pythonPath,
+                prefixArguments: ["-m", devUploadModule]
+            )
         }
+        #endif
 
-        let existingPythonPath = environment["PYTHONPATH"] ?? ""
-        environment["PYTHONPATH"] = existingPythonPath.isEmpty
-            ? devUploadRepoPath
-            : "\(devUploadRepoPath):\(existingPythonPath)"
-
-        return UploadCommand(
-            executable: pythonPath,
-            prefixArguments: ["-m", devUploadModule]
-        )
-        #else
         guard let uploadPath = findUploadExecutable() else { return nil }
         return UploadCommand(executable: uploadPath, prefixArguments: [])
-        #endif
     }
 
     static func findBQExecutable() -> String? {

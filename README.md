@@ -25,6 +25,23 @@ xcodebuild -scheme TableDrop -configuration Release build
 open build/Release/TableDrop.app
 ```
 
+## Local bqcsv development
+
+Debug builds can run against a local `bqcsv` checkout instead of an installed CLI:
+
+```bash
+cp Development.xcconfig.example Development.xcconfig
+# edit Development.xcconfig and set BQCSV_DEV_REPO to your checkout
+```
+
+The repo root must contain `bqcsv/cli.py`. The app runs `python3 -m bqcsv.cli` with `PYTHONPATH` set to that directory. `Development.xcconfig` is gitignored; the shared Xcode scheme passes `BQCSV_DEV_REPO` into the app at launch.
+
+If `BQCSV_DEV_REPO` is unset, Debug falls back to the same lookup as Release (`BQCSV_PATH`, Homebrew, pyenv, `PATH`). An editable install also works:
+
+```bash
+pip install -e /path/to/bqcsv
+```
+
 ## Usage
 
 1. Enter the destination as `project_id.dataset_id.table_id` (saved between launches).
