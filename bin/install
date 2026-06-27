@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Update when Table Drop is live on the Mac App Store.
+APP_STORE_URL=""
+
+info() { printf '==> %s\n' "$*"; }
+warn() { printf 'warning: %s\n' "$*" >&2; }
+die() { printf 'error: %s\n' "$*" >&2; exit 1; }
+
+require_macos() {
+  [[ "$(uname -s)" == "Darwin" ]] || die "This installer supports macOS only."
+}
+
+check_gcloud() {
+  if command -v bq >/dev/null 2>&1 && command -v gcloud >/dev/null 2>&1; then
+    info "Google Cloud SDK found ($(command -v bq))"
+    return
+  fi
+
+  warn "bq and gcloud were not found on your PATH."
+  if command -v brew >/dev/null 2>&1; then
+    info "Install the Google Cloud SDK with:"
+    printf '  brew install --cask google-cloud-sdk\n'
+  else
+    info "Install the Google Cloud SDK from:"
+    printf '  https://cloud.google.com/sdk/docs/install\n'
+  fi
+  printf '\nAfter installing, authenticate:\n'
+  printf '  gcloud auth login\n'
+  printf '  gcloud auth application-default login   # optional, if bq asks for ADC\n'
+  exit 1
+}
+
+install_bqcsv() {
+  if command -v bqcsv >/dev/null 2>&1; then
+    info "bqcsv is already installed ($(command -v bqcsv))"
+    return
+  fi
+
+  if command -v brew >/dev/null 2>&1; then
+    info "Installing bqcsv with Homebrew Python..."
+    if ! brew list python &>/dev/null; then
+      brew install python
+    fi
+    "$(brew --prefix)/bin/pip3" install --upgrade bqcsv
+    command -v bqcsv >/dev/null 2>&1 || die "bqcsv install finished but the command is not on PATH."
+    info "bqcsv installed ($(command -v bqcsv))"
+    return
+  fi
+
+  if command -v pipx >/dev/null 2>&1; then
+    info "Installing bqcsv with pipx..."
+    pipx install bqcsv
+    info "bqcsv installed ($(command -v bqcsv))"
+    warn "Table Drop looks for bqcsv in /opt/homebrew/bin and /usr/local/bin."
+    warn "If uploads fail, set BQCSV_PATH to $(command -v bqcsv)."
+    return
+  fi
+
+  info "Installing bqcsv with pip (user install)..."
+  python3 -m pip install --user --upgrade bqcsv
+  warn "Table Drop may not see user-installed CLIs. Set BQCSV_PATH if uploads fail:"
+  warn "  export BQCSV_PATH=\"\$(python3 -m site --user-base)/bin/bqcsv\""
+}
+
+print_app_store_message() {
+  printf '\n'
+  if [[ -n "$APP_STORE_URL" ]]; then
+    info "Install Table Drop from the Mac App Store:"
+    printf '  %s\n' "$APP_STORE_URL"
+  else
+    info "Install Table Drop from the Mac App Store when it is available."
+  fi
+  printf '\n'
+  info "Setup complete."
+}
+
+main() {
+  require_macos
+  info "Table Drop setup"
+  check_gcloud
+  install_bqcsv
+  print_app_store_message
+}
+
+main "$@"

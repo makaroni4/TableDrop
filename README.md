@@ -6,10 +6,21 @@ Behind the scenes, the app uses [`bqcsv`](https://github.com/makaroni4/bqcsv) to
 
 No API keys or OAuth setup required — the app reuses your existing `gcloud` / `bq` credentials.
 
+## Installation
+
+1. Install **Table Drop** from the Mac App Store.
+2. Run the setup script to install `bqcsv` and verify the Google Cloud SDK:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/makaroni4/TableDrop/main/bin/install | bash
+```
+
+The script checks for `bq` / `gcloud`, installs `bqcsv` (via Homebrew Python when available), and prints next steps.
+
 ## Prerequisites
 
 1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) with `bq` and `gcloud` installed.
-2. `bqcsv` CLI installed (e.g. `pip install bqcsv`).
+2. `bqcsv` CLI installed (the setup script above handles this).
 3. Authenticated CLI session:
 
 ```bash
