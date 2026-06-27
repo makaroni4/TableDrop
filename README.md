@@ -1,11 +1,11 @@
 # Table Drop
 
-A lightweight macOS app for uploading CSV files to BigQuery. It shells out to [`upload-bq-dataset`](https://pypi.org/project/upload-bq-dataset/) and reuses your existing `gcloud` / `bq` credentials — no API keys or OAuth setup in the app itself.
+A lightweight macOS app for uploading CSV files to BigQuery. It shells out to `bqcsv` and reuses your existing `gcloud` / `bq` credentials — no API keys or OAuth setup in the app itself.
 
 ## Prerequisites
 
 1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) with `bq` and `gcloud` installed
-2. `upload-bq-dataset` CLI installed (e.g. `pip install upload-bq-dataset`)
+2. `bqcsv` CLI installed (e.g. `pip install bqcsv`)
 3. Authenticated CLI session:
 
 ```bash
@@ -34,13 +34,13 @@ open build/Release/TableDrop.app
 The app runs:
 
 ```bash
-upload-bq-dataset data.csv --project PROJECT --dataset DATASET --table TABLE [--replace]
+bqcsv data.csv --project PROJECT --dataset DATASET --table TABLE [--replace]
 ```
 
 Before uploading, it checks BigQuery via `bq show`:
 
 1. Creates the dataset with `bq mk -d` if it does not exist.
-2. Creates the table on upload if it does not exist (`upload-bq-dataset` autodetects schema and column names from the CSV header).
+2. Creates the table on upload if it does not exist (`bqcsv` autodetects schema and column names from the CSV header).
 3. Passes `--replace` if the table already exists.
 
 ## Notes

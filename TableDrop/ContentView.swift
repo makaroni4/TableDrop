@@ -107,22 +107,39 @@ struct ContentView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("🔴 There was an error during the upload")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                    if let log = uploadResult.log {
-                        Text(log)
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                    }
+                    uploadErrorView(
+                        message: "🔴 There was an error during the upload.",
+                        log: uploadResult.log
+                    )
                 }
             } else if !statusMessage.isEmpty {
                 Text(statusMessage)
                     .font(.caption)
                     .foregroundStyle(statusIsError ? .red : .secondary)
                     .textSelection(.enabled)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func uploadErrorView(message: String, log: String?) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+
+            if let log, !log.isEmpty {
+                ScrollView {
+                    Text(log)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(height: 100)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -221,9 +238,12 @@ struct ContentView: View {
                 }
             } catch {
                 await MainActor.run {
-                    uploadResult = nil
-                    statusMessage = error.localizedDescription
-                    statusIsError = true
+                    uploadResult = BQUploadService.UploadResult(
+                        succeeded: false,
+                        log: error.localizedDescription
+                    )
+                    statusMessage = ""
+                    statusIsError = false
                     isUploading = false
                     selectedFileURL = nil
                 }

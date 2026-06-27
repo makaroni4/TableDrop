@@ -12,9 +12,9 @@ enum BQUploadError: LocalizedError {
             return "Invalid table reference '\(ref)'. Use project_id.dataset_id.table_id"
         case .uploadCLINotFound:
             #if DEBUG
-            return "Local upload_bq_dataset module not found. Check /Users/makaroni4/Startups/upload_bq_dataset and ensure python3 is on your PATH."
+            return "Local bqcsv module not found. Check /Users/makaroni4/Startups/bqcsv and ensure python3 is on your PATH."
             #else
-            return "upload-bq-dataset CLI not found. Install it and ensure it is on your PATH."
+            return "bqcsv CLI not found. Install it and ensure it is on your PATH."
             #endif
         case .bqNotFound:
             return "bq CLI not found. Install the Google Cloud SDK and ensure bq is on your PATH."
@@ -36,8 +36,8 @@ struct BQUploadService {
     }
 
     #if DEBUG
-    private static let devUploadRepoPath = "/Users/makaroni4/Startups/upload_bq_dataset"
-    private static let devUploadModule = "upload_bq_dataset.cli"
+    private static let devUploadRepoPath = "/Users/makaroni4/Startups/bqcsv"
+    private static let devUploadModule = "bqcsv.cli"
     #endif
 
     struct TableComponents {
@@ -75,10 +75,10 @@ struct BQUploadService {
 
     static func findUploadExecutable() -> String? {
         let candidates = [
-            ProcessInfo.processInfo.environment["UPLOAD_BQ_DATASET_PATH"],
-            "\(NSHomeDirectory())/.pyenv/shims/upload-bq-dataset",
-            "/opt/homebrew/bin/upload-bq-dataset",
-            "/usr/local/bin/upload-bq-dataset",
+            ProcessInfo.processInfo.environment["BQCSV_PATH"],
+            "\(NSHomeDirectory())/.pyenv/shims/bqcsv",
+            "/opt/homebrew/bin/bqcsv",
+            "/usr/local/bin/bqcsv",
         ].compactMap { $0 }
 
         for path in candidates {
@@ -87,13 +87,13 @@ struct BQUploadService {
             }
         }
 
-        return resolveFromPATH(executable: "upload-bq-dataset")
+        return resolveFromPATH(executable: "bqcsv")
     }
 
     static func findPythonExecutable() -> String? {
         let candidates = [
             ProcessInfo.processInfo.environment["PYTHON_PATH"],
-            ProcessInfo.processInfo.environment["UPLOAD_BQ_DATASET_PYTHON"],
+            ProcessInfo.processInfo.environment["BQCSV_PYTHON"],
             "\(NSHomeDirectory())/.pyenv/shims/python3",
             "/opt/homebrew/bin/python3",
             "/usr/local/bin/python3",
@@ -110,7 +110,7 @@ struct BQUploadService {
 
     private static func resolveUploadCommand(environment: inout [String: String]) -> UploadCommand? {
         #if DEBUG
-        let cliPath = "\(devUploadRepoPath)/upload_bq_dataset/cli.py"
+        let cliPath = "\(devUploadRepoPath)/bqcsv/cli.py"
         guard FileManager.default.isReadableFile(atPath: cliPath),
               let pythonPath = findPythonExecutable()
         else {
@@ -303,7 +303,7 @@ struct BQUploadService {
 
         guard uploadResult.status == 0 else {
             let message = uploadResult.output.isEmpty
-                ? "upload-bq-dataset failed with exit code \(uploadResult.status)"
+                ? "bqcsv failed with exit code \(uploadResult.status)"
                 : uploadResult.output
             throw BQUploadError.uploadFailed(message)
         }
