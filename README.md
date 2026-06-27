@@ -12,7 +12,7 @@ No API keys or OAuth setup required — the app reuses your existing `gcloud` /
 2. Run the setup script to install `bqcsv` and verify the Google Cloud SDK:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/makaroni4/TableDrop/main/bin/install | bash
+curl -fsSL https://raw.githubusercontent.com/makaroni4/TableDrop/refs/heads/main/bin/install | bash
 ```
 
 The script checks for `bq` / `gcloud`, installs `bqcsv` (via Homebrew Python when available), and prints next steps.
