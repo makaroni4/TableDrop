@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Update when Table Drop is live on the Mac App Store.
-APP_STORE_URL=""
+GITHUB_REPO="makaroni4/TableDrop"
+APP_PATH="/Applications/TableDrop.app"
 
 info() { printf '==> %s\n' "$*"; }
 warn() { printf 'warning: %s\n' "$*" >&2; }
@@ -64,16 +64,53 @@ install_bqcsv() {
   warn "  export BQCSV_PATH=\"\$(python3 -m site --user-base)/bin/bqcsv\""
 }
 
-print_app_store_message() {
-  printf '\n'
-  if [[ -n "$APP_STORE_URL" ]]; then
-    info "Install Table Drop from the Mac App Store:"
-    printf '  %s\n' "$APP_STORE_URL"
+resolve_latest_release_url() {
+  curl -fsSL \
+    -H "Accept: application/vnd.github+json" \
+    -H "User-Agent: TableDrop-install-script" \
+    "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" |
+    python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for asset in data.get('assets', []):
+    if asset['name'].endswith('.zip'):
+        print(asset['browser_download_url'])
+        break
+else:
+    sys.exit(1)
+"
+}
+
+install_tabledrop() {
+  local url tmpdir
+
+  if [[ -d "$APP_PATH" ]]; then
+    info "Updating existing Table Drop installation..."
   else
-    info "Install Table Drop from the Mac App Store when it is available."
+    info "Installing Table Drop from the latest GitHub release..."
   fi
+
+  url="$(resolve_latest_release_url)" || die "Could not find a release archive at https://github.com/${GITHUB_REPO}/releases"
+
+  tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/tabledrop-install.XXXXXX")"
+  curl -fsSL -o "${tmpdir}/TableDrop.zip" "$url"
+  unzip -q -o "${tmpdir}/TableDrop.zip" -d "$tmpdir"
+  [[ -d "${tmpdir}/TableDrop.app" ]] || die "Release archive did not contain TableDrop.app"
+
+  rm -rf "$APP_PATH"
+  mv "${tmpdir}/TableDrop.app" "$APP_PATH"
+  rm -rf "$tmpdir"
+
+  info "Installed Table Drop to ${APP_PATH}"
+}
+
+print_completion_message() {
   printf '\n'
   info "Setup complete."
+  info "Open Table Drop from Applications or run:"
+  printf '  open %s\n' "$APP_PATH"
+  warn "On first launch, macOS may block the app because it is not from the App Store."
+  warn "Open System Settings → Privacy & Security and choose Open Anyway if prompted."
 }
 
 main() {
@@ -81,7 +118,8 @@ main() {
   info "Table Drop setup"
   check_gcloud
   install_bqcsv
-  print_app_store_message
+  install_tabledrop
+  print_completion_message
 }
 
 main "$@"
