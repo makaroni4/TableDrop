@@ -7,19 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000010000000000000001 /* TableDropApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001 /* TableDropApp.swift */; };
+		A10000010000000000000001 /* CSVDropApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001 /* CSVDropApp.swift */; };
 		A10000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000002 /* ContentView.swift */; };
 		A10000010000000000000003 /* BQUploadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000003 /* BQUploadService.swift */; };
 		A10000010000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000004 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A10000020000000000000001 /* TableDropApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableDropApp.swift; sourceTree = "<group>"; };
+		A10000020000000000000001 /* CSVDropApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVDropApp.swift; sourceTree = "<group>"; };
 		A10000020000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A10000020000000000000003 /* BQUploadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BQUploadService.swift; sourceTree = "<group>"; };
 		A10000020000000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A10000020000000000000005 /* TableDrop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableDrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000020000000000000006 /* TableDrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TableDrop.entitlements; sourceTree = "<group>"; };
+		A10000020000000000000005 /* CSVDrop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSVDrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000020000000000000006 /* CSVDrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CSVDrop.entitlements; sourceTree = "<group>"; };
 		A100000B0000000000000001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A100000B0000000000000002 /* Development.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig.example; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -40,27 +40,27 @@
 			children = (
 				A100000B0000000000000001 /* Debug.xcconfig */,
 				A100000B0000000000000002 /* Development.xcconfig.example */,
-				A10000040000000000000002 /* TableDrop */,
+				A10000040000000000000002 /* CSVDrop */,
 				A10000040000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A10000040000000000000002 /* TableDrop */ = {
+		A10000040000000000000002 /* CSVDrop */ = {
 			isa = PBXGroup;
 			children = (
-				A10000020000000000000001 /* TableDropApp.swift */,
+				A10000020000000000000001 /* CSVDropApp.swift */,
 				A10000020000000000000002 /* ContentView.swift */,
 				A10000020000000000000003 /* BQUploadService.swift */,
 				A10000020000000000000004 /* Assets.xcassets */,
-				A10000020000000000000006 /* TableDrop.entitlements */,
+				A10000020000000000000006 /* CSVDrop.entitlements */,
 			);
-			path = TableDrop;
+			path = CSVDrop;
 			sourceTree = "<group>";
 		};
 		A10000040000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000020000000000000005 /* TableDrop.app */,
+				A10000020000000000000005 /* CSVDrop.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,9 +68,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000050000000000000001 /* TableDrop */ = {
+		A10000050000000000000001 /* CSVDrop */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000080000000000000001 /* Build configuration list for PBXNativeTarget "TableDrop" */;
+			buildConfigurationList = A10000080000000000000001 /* Build configuration list for PBXNativeTarget "CSVDrop" */;
 			buildPhases = (
 				A10000060000000000000001 /* Sources */,
 				A10000030000000000000001 /* Frameworks */,
@@ -80,9 +80,9 @@
 			);
 			dependencies = (
 			);
-			name = TableDrop;
-			productName = TableDrop;
-			productReference = A10000020000000000000005 /* TableDrop.app */;
+			name = CSVDrop;
+			productName = CSVDrop;
+			productReference = A10000020000000000000005 /* CSVDrop.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -101,7 +101,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A10000080000000000000002 /* Build configuration list for PBXProject "TableDrop" */;
+			buildConfigurationList = A10000080000000000000002 /* Build configuration list for PBXProject "CSVDrop" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -114,7 +114,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000050000000000000001 /* TableDrop */,
+				A10000050000000000000001 /* CSVDrop */,
 			);
 		};
 /* End PBXProject section */
@@ -135,7 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000010000000000000001 /* TableDropApp.swift in Sources */,
+				A10000010000000000000001 /* CSVDropApp.swift in Sources */,
 				A10000010000000000000002 /* ContentView.swift in Sources */,
 				A10000010000000000000003 /* BQUploadService.swift in Sources */,
 			);
@@ -193,14 +193,14 @@
 			baseConfigurationReference = A100000B0000000000000001 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TableDrop/TableDrop.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CSVDrop/CSVDrop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Table Drop";
+				INFOPLIST_KEY_CFBundleDisplayName = "CSV Drop";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -209,7 +209,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tabledrop.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.csvdrop.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -220,14 +220,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TableDrop/TableDrop.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CSVDrop/CSVDrop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Table Drop";
+				INFOPLIST_KEY_CFBundleDisplayName = "CSV Drop";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -236,7 +236,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tabledrop.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.csvdrop.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -246,7 +246,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000080000000000000001 /* Build configuration list for PBXNativeTarget "TableDrop" */ = {
+		A10000080000000000000001 /* Build configuration list for PBXNativeTarget "CSVDrop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A100000A0000000000000003 /* Debug */,
@@ -255,7 +255,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000080000000000000002 /* Build configuration list for PBXProject "TableDrop" */ = {
+		A10000080000000000000002 /* Build configuration list for PBXProject "CSVDrop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A100000A0000000000000001 /* Debug */,

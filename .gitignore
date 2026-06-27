@@ -1,4 +1,4 @@
-TableDrop/
+CSVDrop/
 Development.xcconfig
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj

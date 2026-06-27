@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GITHUB_REPO="makaroni4/TableDrop"
-APP_PATH="/Applications/TableDrop.app"
+GITHUB_REPO="makaroni4/CSVDrop"
+APP_PATH="/Applications/CSVDrop.app"
 
 info() { printf '==> %s\n' "$*"; }
 warn() { printf 'warning: %s\n' "$*" >&2; }
@@ -53,21 +53,21 @@ install_bqcsv() {
     info "Installing bqcsv with pipx..."
     pipx install bqcsv
     info "bqcsv installed ($(command -v bqcsv))"
-    warn "Table Drop looks for bqcsv in /opt/homebrew/bin and /usr/local/bin."
+    warn "CSV Drop looks for bqcsv in /opt/homebrew/bin and /usr/local/bin."
     warn "If uploads fail, set BQCSV_PATH to $(command -v bqcsv)."
     return
   fi
 
   info "Installing bqcsv with pip (user install)..."
   python3 -m pip install --user --upgrade bqcsv
-  warn "Table Drop may not see user-installed CLIs. Set BQCSV_PATH if uploads fail:"
+  warn "CSV Drop may not see user-installed CLIs. Set BQCSV_PATH if uploads fail:"
   warn "  export BQCSV_PATH=\"\$(python3 -m site --user-base)/bin/bqcsv\""
 }
 
 resolve_latest_release_url() {
   curl -fsSL \
     -H "Accept: application/vnd.github+json" \
-    -H "User-Agent: TableDrop-install-script" \
+    -H "User-Agent: CSVDrop-install-script" \
     "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" |
     python3 -c "
 import json, sys
@@ -81,33 +81,33 @@ else:
 "
 }
 
-install_tabledrop() {
+install_csvdrop() {
   local url tmpdir
 
   if [[ -d "$APP_PATH" ]]; then
-    info "Updating existing Table Drop installation..."
+    info "Updating existing CSV Drop installation..."
   else
-    info "Installing Table Drop from the latest GitHub release..."
+    info "Installing CSV Drop from the latest GitHub release..."
   fi
 
   url="$(resolve_latest_release_url)" || die "Could not find a release archive at https://github.com/${GITHUB_REPO}/releases"
 
-  tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/tabledrop-install.XXXXXX")"
-  curl -fsSL -o "${tmpdir}/TableDrop.zip" "$url"
-  unzip -q -o "${tmpdir}/TableDrop.zip" -d "$tmpdir"
-  [[ -d "${tmpdir}/TableDrop.app" ]] || die "Release archive did not contain TableDrop.app"
+  tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/csvdrop-install.XXXXXX")"
+  curl -fsSL -o "${tmpdir}/CSVDrop.zip" "$url"
+  unzip -q -o "${tmpdir}/CSVDrop.zip" -d "$tmpdir"
+  [[ -d "${tmpdir}/CSVDrop.app" ]] || die "Release archive did not contain CSVDrop.app"
 
   rm -rf "$APP_PATH"
-  mv "${tmpdir}/TableDrop.app" "$APP_PATH"
+  mv "${tmpdir}/CSVDrop.app" "$APP_PATH"
   rm -rf "$tmpdir"
 
-  info "Installed Table Drop to ${APP_PATH}"
+  info "Installed CSV Drop to ${APP_PATH}"
 }
 
 print_completion_message() {
   printf '\n'
   info "Setup complete."
-  info "Open Table Drop from Applications or run:"
+  info "Open CSV Drop from Applications or run:"
   printf '  open %s\n' "$APP_PATH"
   warn "On first launch, macOS may block the app because it is not from the App Store."
   warn "Open System Settings → Privacy & Security and choose Open Anyway if prompted."
@@ -115,10 +115,10 @@ print_completion_message() {
 
 main() {
   require_macos
-  info "Table Drop setup"
+  info "CSV Drop setup"
   check_gcloud
   install_bqcsv
-  install_tabledrop
+  install_csvdrop
   print_completion_message
 }
 

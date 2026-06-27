@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A10000050000000000000001"
-               BuildableName = "TableDrop.app"
-               BlueprintName = "TableDrop"
-               ReferencedContainer = "container:TableDrop.xcodeproj">
+               BuildableName = "CSVDrop.app"
+               BlueprintName = "CSVDrop"
+               ReferencedContainer = "container:CSVDrop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,9 +44,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A10000050000000000000001"
-            BuildableName = "TableDrop.app"
-            BlueprintName = "TableDrop"
-            ReferencedContainer = "container:TableDrop.xcodeproj">
+            BuildableName = "CSVDrop.app"
+            BlueprintName = "CSVDrop"
+            ReferencedContainer = "container:CSVDrop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -68,9 +68,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A10000050000000000000001"
-            BuildableName = "TableDrop.app"
-            BlueprintName = "TableDrop"
-            ReferencedContainer = "container:TableDrop.xcodeproj">
+            BuildableName = "CSVDrop.app"
+            BlueprintName = "CSVDrop"
+            ReferencedContainer = "container:CSVDrop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

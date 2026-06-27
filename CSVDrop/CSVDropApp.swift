@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @main
-struct TableDropApp: App {
+struct CSVDropApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

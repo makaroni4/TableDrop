@@ -5,10 +5,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 VERSION="$(
-  sed -n 's/.*MARKETING_VERSION = \(.*\);/\1/p' TableDrop.xcodeproj/project.pbxproj | head -1 | tr -d ' '
+  sed -n 's/.*MARKETING_VERSION = \(.*\);/\1/p' CSVDrop.xcodeproj/project.pbxproj | head -1 | tr -d ' '
 )"
 TAG="v${VERSION}"
-ZIP="$ROOT/dist/TableDrop-${VERSION}.zip"
+ZIP="$ROOT/dist/CSVDrop-${VERSION}.zip"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "error: gh CLI is required (https://cli.github.com/)" >&2
@@ -25,7 +25,7 @@ fi
 
 echo "Creating GitHub release ${TAG}..."
 gh release create "$TAG" "$ZIP" \
-  --title "Table Drop ${VERSION}" \
+  --title "CSV Drop ${VERSION}" \
   --generate-notes
 
 echo "Published $(gh release view "$TAG" --json url -q .url)"

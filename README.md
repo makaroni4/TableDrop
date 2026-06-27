@@ -1,6 +1,6 @@
-# Table Drop
+# CSV Drop
 
-<img src="https://github.com/makaroni4/TableDrop/blob/main/snapshot.png?raw=true" width="500">
+<img src="https://github.com/makaroni4/CSVDrop/blob/main/snapshot.png?raw=true" width="500">
 
 A lightweight macOS app for uploading CSV files to BigQuery.
 
@@ -10,11 +10,11 @@ No API keys or OAuth setup required — the app reuses your existing `gcloud` /
 
 ## Installation
 
-1. Install **Table Drop** from the Mac App Store.
+1. Install **CSV Drop** from the Mac App Store.
 2. Run the setup script to install `bqcsv` and verify the Google Cloud SDK:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/makaroni4/TableDrop/refs/heads/main/bin/install | bash
+curl -fsSL https://raw.githubusercontent.com/makaroni4/CSVDrop/refs/heads/main/bin/install | bash
 ```
 
 The script checks for `bq` / `gcloud`, installs `bqcsv` (via Homebrew Python when available), and prints next steps.
