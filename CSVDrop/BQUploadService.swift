@@ -100,6 +100,8 @@ struct BQUploadService {
         }
 
         append("\(home)/.pyenv/shims")
+        append("\(home)/.asdf/shims")
+        append("\(home)/.asdf/bin")
         append("/opt/homebrew/bin")
         append("/usr/local/bin")
         append("\(home)/google-cloud-sdk/bin")

@@ -8,6 +8,46 @@ info() { printf '==> %s\n' "$*"; }
 warn() { printf 'warning: %s\n' "$*" >&2; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 
+# Prefer real interpreters over asdf/pyenv shims that fail when no version is set.
+find_python3() {
+  local candidate version asdf_dir
+
+  if command -v brew >/dev/null 2>&1; then
+    candidate="$(brew --prefix 2>/dev/null)/bin/python3"
+    if [[ -n "$candidate" && -x "$candidate" ]] && "$candidate" --version >/dev/null 2>&1; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+
+  if [[ -x /usr/bin/python3 ]] && /usr/bin/python3 --version >/dev/null 2>&1; then
+    printf '%s\n' /usr/bin/python3
+    return 0
+  fi
+
+  if command -v asdf >/dev/null 2>&1; then
+    version="$(asdf list python 2>/dev/null | sed 's/^[*[:space:]]*//' | tail -1)"
+    if [[ -n "$version" ]]; then
+      asdf_dir="$(asdf where python "$version" 2>/dev/null)" || true
+      candidate="${asdf_dir}/bin/python3"
+      if [[ -x "$candidate" ]] && "$candidate" --version >/dev/null 2>&1; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    fi
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    candidate="$(command -v python3)"
+    if "$candidate" --version >/dev/null 2>&1; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 require_macos() {
   [[ "$(uname -s)" == "Darwin" ]] || die "This installer supports macOS only."
 }
@@ -58,23 +98,27 @@ install_bqcsv() {
     return
   fi
 
+  local python3_bin
+  python3_bin="$(find_python3)" || die "Python 3 is required but was not found. Install it with Homebrew (brew install python) or set a python version in asdf."
   info "Installing bqcsv with pip (user install)..."
-  python3 -m pip install --user --upgrade bqcsv
+  "$python3_bin" -m pip install --user --upgrade bqcsv
   warn "CSV Drop may not see user-installed CLIs. Set BQCSV_PATH if uploads fail:"
-  warn "  export BQCSV_PATH=\"\$(python3 -m site --user-base)/bin/bqcsv\""
+  warn "  export BQCSV_PATH=\"\$($python3_bin -m site --user-base)/bin/bqcsv\""
 }
 
 resolve_latest_release_url() {
-  local api_json url
+  local api_json url python3_bin
 
-  if api_json="$(
+  python3_bin="$(find_python3 2>/dev/null)" || true
+
+  if [[ -n "$python3_bin" ]] && api_json="$(
     curl -fsSL \
       -H "Accept: application/vnd.github+json" \
       -H "User-Agent: CSVDrop-install-script" \
       "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" 2>/dev/null
   )"; then
     url="$(
-      printf '%s' "$api_json" | python3 -c "
+      printf '%s' "$api_json" | "$python3_bin" -c "
 import json, sys
 data = json.load(sys.stdin)
 assets = data.get('assets', [])
